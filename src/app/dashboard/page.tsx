@@ -166,6 +166,76 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
+        {/* Welcome Guide — แสดงเฉพาะ user ใหม่ที่ยังไม่มีประกาศ */}
+        {(listingCount ?? 0) === 0 && (
+          <div className="mb-8 rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50/50 to-white p-6 shadow-sm">
+            <h2 className="mb-1 text-base font-bold text-slate-800">เริ่มต้นใช้งาน BanChangHub</h2>
+            <p className="mb-5 text-xs text-slate-500">ทำตาม 4 ขั้นตอนง่ายๆ เพื่อเริ่มลงประกาศ</p>
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                {
+                  step: 1,
+                  title: "กรอกโปรไฟล์",
+                  desc: "ใส่ชื่อ เบอร์โทร LINE ID เพื่อให้ลูกค้าติดต่อได้",
+                  href: "/profile",
+                  icon: User,
+                  color: "from-teal-500 to-emerald-600",
+                  done: !!(profile?.phone),
+                },
+                {
+                  step: 2,
+                  title: "ลงประกาศแรก",
+                  desc: "เพิ่มทรัพย์สิน พร้อมรูปภาพและรายละเอียด",
+                  href: "/listings/new",
+                  icon: Plus,
+                  color: "from-sky-500 to-blue-600",
+                  done: (listingCount ?? 0) > 0,
+                },
+                {
+                  step: 3,
+                  title: "อัปโหลดรูป",
+                  desc: "เพิ่มรูปทรัพย์สินให้น่าสนใจ มากกว่า 5 รูป",
+                  href: "/dashboard/listings",
+                  icon: Eye,
+                  color: "from-amber-500 to-orange-600",
+                  done: false,
+                },
+                {
+                  step: 4,
+                  title: "แชร์ประกาศ",
+                  desc: "แชร์ลง Facebook, LINE กลุ่ม เพื่อเข้าถึงลูกค้า",
+                  href: "/dashboard/listings",
+                  icon: Heart,
+                  color: "from-pink-500 to-rose-600",
+                  done: false,
+                },
+              ].map((s) => (
+                <Link
+                  key={s.step}
+                  href={s.href}
+                  className={`group relative overflow-hidden rounded-xl border p-4 transition-all hover:shadow-md ${
+                    s.done ? "border-green-200 bg-green-50/50" : "border-slate-200 bg-white hover:border-teal-200"
+                  }`}
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br ${s.color} text-white shadow-sm`}>
+                      <s.icon size={16} />
+                    </div>
+                    {s.done ? (
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">เสร็จแล้ว</span>
+                    ) : (
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-500">ขั้นตอน {s.step}</span>
+                    )}
+                  </div>
+                  <h3 className="mb-0.5 text-sm font-bold text-slate-800 group-hover:text-teal-700">{s.title}</h3>
+                  <p className="text-[11px] text-slate-500">{s.desc}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Stats */}
         <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {stats.map((s) => (
