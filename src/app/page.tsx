@@ -91,6 +91,7 @@ export default function LandingPage() {
   const [activeTab, setActiveTab] = useState("home");
   const [currentBanner, setCurrentBanner] = useState(0);
   const [services, setServices] = useState(DEFAULT_SERVICES);
+  const [dbArticles, setDbArticles] = useState<{ title: string; slug: string; category: string; cover_image: string | null; published_at: string }[]>([]);
 
   // Load service pricing from DB
   useEffect(() => {
@@ -120,6 +121,22 @@ export default function LandingPage() {
       }
     }
     loadPricing();
+
+    // Load articles
+    async function loadArticles() {
+      try {
+        const { createClient } = await import("@/lib/supabase-browser");
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("articles")
+          .select("title, slug, category, cover_image, published_at")
+          .eq("status", "published")
+          .order("published_at", { ascending: false })
+          .limit(6);
+        if (data && data.length > 0) setDbArticles(data);
+      } catch {}
+    }
+    loadArticles();
   }, []);
 
   const BANNERS = [
@@ -644,28 +661,32 @@ export default function LandingPage() {
               <h2 className="text-xl font-extrabold text-slate-800 sm:text-2xl">บทความ & ความรู้</h2>
               <p className="mt-1 text-xs text-slate-500">เรื่องน่ารู้เกี่ยวกับบ้าน การก่อสร้าง และการลงทุนอสังหาฯ</p>
             </div>
-            <Link href="/#articles" className="group hidden items-center gap-1 text-sm font-semibold text-[#1e3a5f] hover:text-teal-600 sm:inline-flex">
-              ดูทั้งหมด <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+            <Link href="/articles" className="group hidden items-center gap-1 text-sm font-semibold text-[#1e3a5f] hover:text-teal-600 sm:inline-flex">
+              ดูทั้งหมด ({dbArticles.length > 0 ? `${dbArticles.length}+` : ""}) <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              { title: "5 สิ่งที่ต้องเช็คก่อนซื้อบ้านจัดสรร", category: "ซื้อบ้าน", date: "28 มี.ค. 2026", readTime: "5 นาที" },
-              { title: "รีโนเวทบ้านเก่า งบ 5 แสน ทำอะไรได้บ้าง?", category: "รีโนเวท", date: "25 มี.ค. 2026", readTime: "7 นาที" },
-              { title: "เปรียบเทียบ สร้างบ้านเอง vs ซื้อบ้านจัดสรร", category: "สร้างบ้าน", date: "20 มี.ค. 2026", readTime: "6 นาที" },
-            ].map((article) => (
-              <Link key={article.title} href="/articles" className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md">
+            {(dbArticles.length > 0 ? dbArticles.slice(0, 3) : [
+              { title: "5 สิ่งที่ต้องเช็คก่อนซื้อบ้านจัดสรร", slug: "", category: "buy", cover_image: null, published_at: "" },
+              { title: "รีโนเวทบ้านเก่า งบ 5 แสน ทำอะไรได้บ้าง?", slug: "", category: "renovate", cover_image: null, published_at: "" },
+              { title: "เปรียบเทียบ สร้างบ้านเอง vs ซื้อบ้านจัดสรร", slug: "", category: "build", cover_image: null, published_at: "" },
+            ]).map((article) => (
+              <Link key={article.title} href={article.slug ? `/articles/${article.slug}` : "/articles"} className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md">
                 <div className="flex h-40 items-center justify-center bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50">
-                  <Award size={32} className="text-purple-200" />
+                  {article.cover_image ? (
+                    <img src={article.cover_image} alt={article.title} className="h-full w-full object-cover" />
+                  ) : (
+                    <Award size={32} className="text-purple-200" />
+                  )}
                 </div>
                 <div className="p-4">
                   <span className="mb-2 inline-block rounded bg-teal-50 px-2 py-0.5 text-[10px] font-semibold text-teal-700">{article.category}</span>
                   <h3 className="mb-2 text-sm font-bold leading-snug text-slate-800 group-hover:text-[#1e3a5f]">{article.title}</h3>
-                  <div className="flex items-center gap-3 text-[11px] text-slate-400">
-                    <span>{article.date}</span>
-                    <span className="h-3 w-px bg-slate-200" />
-                    <span className="flex items-center gap-1"><Clock size={10} /> {article.readTime}</span>
-                  </div>
+                  {article.published_at && (
+                    <div className="flex items-center gap-3 text-[11px] text-slate-400">
+                      <span>{new Date(article.published_at).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })}</span>
+                    </div>
+                  )}
                 </div>
               </Link>
             ))}
