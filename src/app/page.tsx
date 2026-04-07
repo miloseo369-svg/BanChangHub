@@ -240,49 +240,69 @@ export default function LandingPage() {
       </section>
 
       {/* HERO */}
-      <section className="bg-gradient-to-b from-[#1e3a5f] to-[#152d4a] px-4 pb-12 pt-12 sm:px-6 sm:pt-16 lg:px-8 lg:pt-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-8 text-center sm:mb-10">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium text-white/90">
-              <Shield size={14} /> แพลตฟอร์มอสังหาริมทรัพย์ อีสานตอนบน ที่คุณวางใจได้
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#0f2439] via-[#1e3a5f] to-[#0d3d5f] px-4 pb-14 pt-14 sm:px-6 sm:pt-20 lg:px-8 lg:pt-24">
+        {/* Decorative blobs */}
+        <div className="pointer-events-none absolute -left-40 -top-40 h-80 w-80 rounded-full bg-teal-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 -right-20 h-60 w-60 rounded-full bg-sky-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute right-1/4 top-10 h-40 w-40 rounded-full bg-amber-400/5 blur-2xl" />
+
+        <div className="relative mx-auto max-w-6xl">
+          <div className="mb-10 text-center sm:mb-12">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-teal-400/30 bg-teal-400/10 px-4 py-1.5 text-xs font-semibold text-teal-300">
+              <Shield size={14} /> แพลตฟอร์ม #1 อสังหาฯ อีสานตอนบน
             </div>
-            <h1 className="mb-4 text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-5xl">
-              ค้นหาบ้านในฝัน สร้างบ้านคุณภาพ
+            <h1 className="mb-5 text-3xl font-extrabold leading-[1.15] text-white sm:text-5xl lg:text-6xl">
+              ค้นหาบ้านในฝัน
               <br />
-              <span className="text-teal-300">ครบจบในที่เดียว</span>
+              <span className="bg-gradient-to-r from-teal-300 via-emerald-300 to-cyan-300 bg-clip-text text-transparent">สร้างบ้านคุณภาพ</span>
             </h1>
-            <p className="mx-auto max-w-lg text-sm text-slate-300 sm:text-base">
-              บ้านจัดสรร รับเหมาก่อสร้าง เซ้งกิจการ — บริหารโดยช่างตัวจริง มาตรฐานวิศวกร
+            <p className="mx-auto max-w-xl text-sm leading-relaxed text-slate-300/90 sm:text-base">
+              บ้านจัดสรร รับเหมาก่อสร้าง เซ้งกิจการ — ครบจบในที่เดียว
+              <br className="hidden sm:block" />
+              บริหารโดยช่างตัวจริง มาตรฐานวิศวกร
             </p>
           </div>
 
           {/* Search Tabs */}
-          <div className="mx-auto max-w-3xl">
-            <div className="flex gap-1 rounded-t-xl bg-white/10 p-1">
+          <div className="mx-auto max-w-4xl">
+            {/* Tabs */}
+            <div className="flex justify-center gap-2 mb-4">
               {[
-                { key: "home", label: "โครงการบ้าน", icon: Home },
-                { key: "build", label: "รับเหมาสร้างบ้าน", icon: Hammer },
+                { key: "home", label: "ซื้อบ้าน", icon: Home },
+                { key: "build", label: "สร้าง/รีโนเวท", icon: Hammer },
                 { key: "seng", label: "เซ้งกิจการ", icon: Store },
               ].map((tab) => (
                 <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all ${activeTab === tab.key ? "bg-white text-[#1e3a5f] shadow-sm" : "text-white/70 hover:text-white"}`}>
+                  className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all ${activeTab === tab.key ? "bg-white text-[#1e3a5f] shadow-lg shadow-white/20" : "bg-white/10 text-white/80 hover:bg-white/20"}`}>
                   <tab.icon size={16} />
-                  <span className="hidden sm:inline">{tab.label}</span>
+                  {tab.label}
                 </button>
               ))}
             </div>
 
-            <div className="rounded-b-xl bg-white p-4 shadow-xl shadow-black/10">
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <SelectField placeholder="เลือกจังหวัด" options={PROVINCES} />
-                <SelectField
-                  placeholder={activeTab === "build" ? "ประเภทงาน" : activeTab === "seng" ? "ประเภทกิจการ" : "ประเภทบ้าน"}
-                  options={activeTab === "build" ? ["สร้างบ้านใหม่", "รีโนเวท", "ต่อเติม"] : activeTab === "seng" ? ["ร้านอาหาร", "ร้านกาแฟ", "ร้านค้า"] : PROPERTY_TYPES}
-                />
-                <SelectField placeholder="งบประมาณ" options={PRICE_RANGES} />
-                <button className="flex items-center justify-center gap-1.5 rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-teal-700">
-                  <Search size={16} /> ค้นหา
-                </button>
+            {/* Search Box */}
+            <div className="rounded-2xl bg-white p-5 shadow-2xl shadow-black/20 ring-1 ring-white/20 sm:p-6">
+              <div className="grid gap-3 sm:grid-cols-4">
+                <div className="sm:col-span-1">
+                  <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">จังหวัด</label>
+                  <SelectField placeholder="ทุกจังหวัด" options={PROVINCES} />
+                </div>
+                <div className="sm:col-span-1">
+                  <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">ประเภท</label>
+                  <SelectField
+                    placeholder={activeTab === "build" ? "ประเภทงาน" : activeTab === "seng" ? "ประเภทกิจการ" : "ประเภทบ้าน"}
+                    options={activeTab === "build" ? ["สร้างบ้านใหม่", "รีโนเวท", "ต่อเติม"] : activeTab === "seng" ? ["ร้านอาหาร", "ร้านกาแฟ", "ร้านค้า"] : PROPERTY_TYPES}
+                  />
+                </div>
+                <div className="sm:col-span-1">
+                  <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">งบประมาณ</label>
+                  <SelectField placeholder="ทุกราคา" options={PRICE_RANGES} />
+                </div>
+                <div className="flex items-end sm:col-span-1">
+                  <Link href="/listings" className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 py-3 text-sm font-bold text-white shadow-lg shadow-teal-500/30 transition-all hover:shadow-xl hover:shadow-teal-500/40">
+                    <Search size={18} /> ค้นหา
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -296,17 +316,19 @@ export default function LandingPage() {
           </div>
 
           {/* Stats */}
-          <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4">
             {[
-              { icon: Building2, val: "150+", label: "โครงการบ้าน", iconColor: "text-teal-300" },
-              { icon: Users, val: "2,500+", label: "ลูกค้าเชื่อมั่น", iconColor: "text-sky-300" },
-              { icon: Star, val: "4.9/5", label: "คะแนนรีวิว", iconColor: "text-amber-300" },
-              { icon: Shield, val: "100%", label: "รับประกันงาน", iconColor: "text-emerald-300" },
+              { icon: Building2, val: "150+", label: "โครงการบ้าน", gradient: "from-teal-400 to-emerald-400" },
+              { icon: Users, val: "2,500+", label: "ลูกค้าเชื่อมั่น", gradient: "from-sky-400 to-blue-400" },
+              { icon: Star, val: "4.9/5", label: "คะแนนรีวิว", gradient: "from-amber-400 to-orange-400" },
+              { icon: Shield, val: "100%", label: "รับประกันงาน", gradient: "from-emerald-400 to-green-400" },
             ].map((s) => (
-              <div key={s.label} className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center backdrop-blur-sm">
-                <s.icon size={18} className={`mx-auto mb-1 ${s.iconColor}`} />
-                <p className="text-lg font-extrabold text-white">{s.val}</p>
-                <p className="text-[11px] text-slate-400">{s.label}</p>
+              <div key={s.label} className="group rounded-2xl border border-white/10 bg-white/5 px-5 py-5 text-center backdrop-blur-sm transition-all hover:bg-white/10">
+                <div className={`mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${s.gradient} shadow-lg`}>
+                  <s.icon size={18} className="text-white" />
+                </div>
+                <p className="text-2xl font-extrabold text-white">{s.val}</p>
+                <p className="text-xs text-slate-400">{s.label}</p>
               </div>
             ))}
           </div>
@@ -713,8 +735,28 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* LINE Floating */}
-      <a href="https://line.me/R/ti/p/@banchanghub" target="_blank" rel="noopener noreferrer" className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#06c755] shadow-lg transition-transform hover:scale-110" title="LINE">
+      {/* Mobile Sticky Bottom Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/95 px-2 py-2 backdrop-blur-md sm:hidden">
+        <div className="flex items-center gap-2">
+          <Link href="/listings" className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 py-2.5 text-xs font-bold text-white shadow-sm">
+            <Search size={14} /> ค้นหา
+          </Link>
+          <Link href="/listings/new" className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#1e3a5f] py-2.5 text-xs font-bold text-white shadow-sm">
+            <Home size={14} /> ลงประกาศ
+          </Link>
+          <a href="tel:0812345678" className="flex items-center justify-center rounded-xl bg-amber-500 px-4 py-2.5 text-white shadow-sm">
+            <Phone size={16} />
+          </a>
+          <a href="https://line.me/R/ti/p/@banchanghub" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center rounded-xl bg-[#06c755] px-4 py-2.5 text-white shadow-sm">
+            <MessageCircle size={16} />
+          </a>
+        </div>
+      </div>
+      {/* Spacer for mobile sticky */}
+      <div className="h-16 sm:hidden" />
+
+      {/* LINE Floating — desktop only */}
+      <a href="https://line.me/R/ti/p/@banchanghub" target="_blank" rel="noopener noreferrer" className="fixed bottom-5 right-5 z-50 hidden h-14 w-14 items-center justify-center rounded-full bg-[#06c755] shadow-lg transition-transform hover:scale-110 sm:flex" title="LINE">
         <MessageCircle size={26} className="text-white" />
       </a>
     </div>

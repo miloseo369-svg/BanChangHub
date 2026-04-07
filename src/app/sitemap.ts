@@ -61,12 +61,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Province filter pages
   const { data: provinces } = await supabase
     .from("provinces")
-    .select("id, name");
+    .select("id, name, slug");
 
-  const provincePages: MetadataRoute.Sitemap = (provinces ?? []).map((p) => ({
+  const provinceFilterPages: MetadataRoute.Sitemap = (provinces ?? []).map((p) => ({
     url: `${SITE_URL}/listings?province=${p.id}`,
     changeFrequency: "daily" as const,
-    priority: 0.7,
+    priority: 0.6,
+  }));
+
+  // Hyper-local province pages (SEO landing pages)
+  const provinceLocalPages: MetadataRoute.Sitemap = (provinces ?? []).map((p) => ({
+    url: `${SITE_URL}/listings/province/${p.slug}`,
+    changeFrequency: "daily" as const,
+    priority: 0.8,
   }));
 
   return [
@@ -74,6 +81,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...listingPages,
     ...articlePages,
     ...categoryPages,
-    ...provincePages,
+    ...provinceFilterPages,
+    ...provinceLocalPages,
   ];
 }
