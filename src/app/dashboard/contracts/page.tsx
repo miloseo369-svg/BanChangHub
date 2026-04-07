@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Home,
@@ -40,6 +40,7 @@ const CONTRACT_TYPES = [
 
 export default function ContractsPage() {
   const [type, setType] = useState("sale");
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const [form, setForm] = useState({
     sellerName: "",
     sellerIdCard: "",
@@ -63,6 +64,36 @@ export default function ContractsPage() {
     rentEndDate: "",
     rentDeposit: "",
   });
+
+  // Auto-fill ข้อมูลผู้ขาย/นายหน้าจาก profile
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const { createClient } = await import("@/lib/supabase-browser");
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, phone, company_name")
+          .eq("id", user.id)
+          .single();
+
+        if (profile) {
+          setForm((prev) => ({
+            ...prev,
+            sellerName: profile.full_name || prev.sellerName,
+            sellerPhone: profile.phone || prev.sellerPhone,
+          }));
+          setProfileLoaded(true);
+        }
+      } catch {
+        // ไม่สำเร็จ — ให้กรอกเอง
+      }
+    }
+    loadProfile();
+  }, []);
 
   function update(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -145,7 +176,14 @@ export default function ContractsPage() {
 
             {/* Seller */}
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 className="mb-3 text-sm font-bold text-teal-700">{labels.seller}</h3>
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-sm font-bold text-teal-700">{labels.seller}</h3>
+                {profileLoaded && (
+                  <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-semibold text-teal-600">
+                    ดึงจากโปรไฟล์แล้ว
+                  </span>
+                )}
+              </div>
               <div className="space-y-3">
                 <div><label className={labelClass}>ชื่อ-นามสกุล</label><input value={form.sellerName} onChange={(e) => update("sellerName", e.target.value)} placeholder="นาย/นาง..." className={inputClass} /></div>
                 <div className="grid grid-cols-2 gap-3">
