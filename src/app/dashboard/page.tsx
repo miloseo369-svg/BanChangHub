@@ -397,6 +397,11 @@ export default async function DashboardPage() {
                     icon: Package,
                   },
                   {
+                    label: "สร้างสัญญา",
+                    href: "/dashboard/contracts",
+                    icon: FileText,
+                  },
+                  {
                     label: "เขียนบทความ",
                     href: "/dashboard/articles/new",
                     icon: FileText,
