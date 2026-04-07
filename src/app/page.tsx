@@ -54,6 +54,8 @@ const SERVICES = [
   { title: "สร้างบ้านใหม่", desc: "ออกแบบและสร้างบ้านในฝัน ควบคุมทุกขั้นตอนโดยวิศวกร", startPrice: "8,500", unit: "บาท/ตร.ม.", features: ["ออกแบบฟรี", "ควบคุมโดยวิศวกร", "รับประกัน 5 ปี"], accent: "from-teal-500 to-emerald-500" },
   { title: "รีโนเวทบ้าน", desc: "ปรับปรุงบ้านเก่าให้เป็นบ้านใหม่ งานไฟ ประปา โครงสร้าง ครบวงจร", startPrice: "3,500", unit: "บาท/ตร.ม.", features: ["ประเมินราคาฟรี", "ไม่มีค่าใช้จ่ายซ่อน", "ดูแลหลังงาน"], accent: "from-sky-500 to-blue-500" },
   { title: "ต่อเติม-ปรับปรุง", desc: "ต่อเติมห้อง ครัว หลังคา ระเบียง เพิ่มพื้นที่ใช้สอย", startPrice: "5,000", unit: "บาท/ตร.ม.", features: ["ตรวจโครงสร้างฟรี", "ใบอนุญาตถูกต้อง", "วัสดุคุณภาพ"], accent: "from-amber-500 to-orange-500" },
+  { title: "บ้านน็อคดาวน์", desc: "บ้านสำเร็จรูป สร้างไว ราคาประหยัด พร้อมอยู่ภายใน 45 วัน", startPrice: "4,500", unit: "บาท/ตร.ม.", features: ["สร้างเสร็จ 45 วัน", "ราคาเหมาจ่าย", "ย้ายได้ ทนทาน"], accent: "from-violet-500 to-purple-500" },
+  { title: "บ้านน้องหมา-น้องแมว", desc: "ออกแบบและสร้างบ้านสัตว์เลี้ยง คอกสุนัข กรงแมว สั่งทำตามขนาด", startPrice: "2,500", unit: "บาท/หลัง", features: ["สั่งทำตามขนาด", "วัสดุปลอดภัย", "กันฝน-แดด"], accent: "from-rose-500 to-pink-500" },
 ];
 
 const MARKETPLACE = [
@@ -454,7 +456,7 @@ export default function LandingPage() {
             <p className="mt-1 text-xs text-slate-500 sm:text-sm">ทีมช่างมืออาชีพ ควบคุมงานโดยวิศวกร รับประกันคุณภาพทุกโครงการ</p>
           </div>
 
-          <div className="mb-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {SERVICES.map((s) => (
               <div key={s.title} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md">
                 <div className={`h-1.5 bg-gradient-to-r ${s.accent}`} />
