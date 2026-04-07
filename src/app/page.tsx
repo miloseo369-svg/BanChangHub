@@ -35,6 +35,7 @@ import {
   Clock,
   ShieldCheck,
   LogIn,
+  Sparkles,
 } from "lucide-react";
 
 // ─── Data ───
@@ -215,29 +216,7 @@ export default function LandingPage() {
         )}
       </nav>
 
-      {/* BANNER SLIDESHOW */}
-      <section className="relative overflow-hidden">
-        <div className={`bg-gradient-to-r ${BANNERS[currentBanner].bg} px-4 py-4 transition-all duration-700 sm:py-5`}>
-          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 sm:flex-row">
-            <div className="text-center sm:text-left">
-              <h3 className="text-sm font-bold text-white sm:text-base">{BANNERS[currentBanner].title}</h3>
-              <p className="text-[11px] text-white/80 sm:text-xs">{BANNERS[currentBanner].subtitle}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Link href="/listings" className="shrink-0 rounded-lg bg-white px-4 py-2 text-xs font-bold text-slate-800 shadow-sm hover:bg-slate-50">
-                {BANNERS[currentBanner].cta}
-              </Link>
-              {/* Dots */}
-              <div className="flex gap-1.5">
-                {BANNERS.map((_, i) => (
-                  <button key={i} onClick={() => setCurrentBanner(i)}
-                    className={`h-2 rounded-full transition-all ${i === currentBanner ? "w-5 bg-white" : "w-2 bg-white/40"}`} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* BANNER — compact, inside hero */}
 
       {/* HERO */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#0f2439] via-[#1e3a5f] to-[#0d3d5f] px-4 pb-14 pt-14 sm:px-6 sm:pt-20 lg:px-8 lg:pt-24">
@@ -248,8 +227,11 @@ export default function LandingPage() {
 
         <div className="relative mx-auto max-w-6xl">
           <div className="mb-10 text-center sm:mb-12">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-teal-400/30 bg-teal-400/10 px-4 py-1.5 text-xs font-semibold text-teal-300">
-              <Shield size={14} /> แพลตฟอร์ม #1 อสังหาฯ อีสานตอนบน
+            {/* Promo banner — integrated */}
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400/20 to-orange-400/20 border border-amber-400/30 px-4 py-1.5 text-xs font-semibold text-amber-200">
+              <Sparkles size={13} /> {BANNERS[currentBanner].title}
+              <span className="text-amber-300/60">|</span>
+              <span className="text-[10px] text-amber-300/80">{BANNERS[currentBanner].subtitle.slice(0, 40)}</span>
             </div>
             <h1 className="mb-5 text-3xl font-extrabold leading-[1.15] text-white sm:text-5xl lg:text-6xl">
               ค้นหาบ้านในฝัน
@@ -282,20 +264,26 @@ export default function LandingPage() {
 
             {/* Search Box */}
             <div className="rounded-2xl bg-white p-5 shadow-2xl shadow-black/20 ring-1 ring-white/20 sm:p-6">
-              <div className="grid gap-3 sm:grid-cols-4">
+              <div className="grid gap-4 sm:grid-cols-4">
                 <div className="sm:col-span-1">
-                  <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">จังหวัด</label>
+                  <label className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-slate-700">
+                    <MapPin size={13} className="text-teal-500" /> จังหวัด
+                  </label>
                   <SelectField placeholder="ทุกจังหวัด" options={PROVINCES} />
                 </div>
                 <div className="sm:col-span-1">
-                  <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">ประเภท</label>
+                  <label className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-slate-700">
+                    <Home size={13} className="text-sky-500" /> ประเภท
+                  </label>
                   <SelectField
                     placeholder={activeTab === "build" ? "ประเภทงาน" : activeTab === "seng" ? "ประเภทกิจการ" : "ประเภทบ้าน"}
                     options={activeTab === "build" ? ["สร้างบ้านใหม่", "รีโนเวท", "ต่อเติม"] : activeTab === "seng" ? ["ร้านอาหาร", "ร้านกาแฟ", "ร้านค้า"] : PROPERTY_TYPES}
                   />
                 </div>
                 <div className="sm:col-span-1">
-                  <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">งบประมาณ</label>
+                  <label className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-slate-700">
+                    <Ruler size={13} className="text-amber-500" /> งบประมาณ
+                  </label>
                   <SelectField placeholder="ทุกราคา" options={PRICE_RANGES} />
                 </div>
                 <div className="flex items-end sm:col-span-1">
@@ -304,15 +292,16 @@ export default function LandingPage() {
                   </Link>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Quick Links */}
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-300">
-            <span>ยอดนิยม:</span>
-            {["บ้านอุดรธานี", "บ้านหนองคาย", "ที่ดินขอนแก่น", "รับเหมาอุดร"].map((kw) => (
-              <Link key={kw} href={`/listings?q=${encodeURIComponent(kw)}`} className="rounded-full border border-white/20 px-3 py-1 hover:bg-white/10">{kw}</Link>
-            ))}
+              {/* Popular tags — inside search box */}
+              <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3 text-xs text-slate-400">
+                <span className="font-semibold">ยอดนิยม:</span>
+                {["บ้านอุดรธานี", "บ้านหนองคาย", "ที่ดินขอนแก่น", "รับเหมาอุดร", "เซ้งร้านหนองคาย"].map((kw) => (
+                  <Link key={kw} href={`/listings?q=${encodeURIComponent(kw)}`}
+                    className="rounded-full bg-slate-50 px-3 py-1 text-slate-500 transition-colors hover:bg-teal-50 hover:text-teal-700">{kw}</Link>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Stats */}
