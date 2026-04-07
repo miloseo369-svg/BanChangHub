@@ -16,6 +16,7 @@ const NAV = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "ประกาศ", href: "/admin/listings", icon: FileText },
   { label: "ผู้ใช้", href: "/admin/users", icon: Users },
+  { label: "ตัวแทน", href: "/admin/agents", icon: Users },
   { label: "การชำระเงิน", href: "/admin/payments", icon: CreditCard },
   { label: "ราคาบริการ", href: "/admin/pricing", icon: DollarSign },
   { label: "แบนเนอร์", href: "/admin/banners", icon: Image },
