@@ -7,6 +7,7 @@ import {
   Users,
   Image,
   CreditCard,
+  MessageCircle,
   ArrowLeft,
 } from "lucide-react";
 
@@ -16,6 +17,7 @@ const NAV = [
   { label: "ผู้ใช้", href: "/admin/users", icon: Users },
   { label: "การชำระเงิน", href: "/admin/payments", icon: CreditCard },
   { label: "แบนเนอร์", href: "/admin/banners", icon: Image },
+  { label: "LINE Bot", href: "/admin/line", icon: MessageCircle },
 ];
 
 export default async function AdminLayout({
