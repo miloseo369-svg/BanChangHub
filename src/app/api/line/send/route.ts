@@ -13,6 +13,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "LINE not configured" }, { status: 503 });
   }
 
+  // Auth check — ต้อง login ถึงจะส่งได้
+  const authHeader = request.headers.get("authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await request.json();
   const { listingId, lineUserId } = body;
 

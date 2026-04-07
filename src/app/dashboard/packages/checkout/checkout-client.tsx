@@ -15,7 +15,8 @@ import {
   ImagePlus,
 } from "lucide-react";
 
-const PROMPTPAY_NUMBER = process.env.NEXT_PUBLIC_PROMPTPAY_ID ?? "0812345678";
+const PROMPTPAY_NUMBER = process.env.NEXT_PUBLIC_PROMPTPAY_ID || "";
+const IS_PROMPTPAY_SET = !!process.env.NEXT_PUBLIC_PROMPTPAY_ID;
 
 export default function CheckoutClient({
   packageId,
@@ -145,6 +146,12 @@ export default function CheckoutClient({
             <QrCode size={16} className="text-teal-600" />
             สแกน QR PromptPay เพื่อชำระ
           </h2>
+
+          {!IS_PROMPTPAY_SET && (
+            <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+              ยังไม่ได้ตั้งค่า PromptPay — กรุณาติดต่อแอดมิน
+            </div>
+          )}
 
           {error && (
             <div className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">{error}</div>
