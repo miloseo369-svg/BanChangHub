@@ -50,7 +50,8 @@ const PROPERTIES = [
   { id: "BCH-25680004", title: "หมู่บ้านจัดสรร บ้านดุง", price: "2,790,000", pricePerSqm: "21,461", location: "ต.ศรีสุทโธ อ.บ้านดุง จ.อุดรธานี", beds: 3, baths: 2, parking: 1, area: "130", landArea: "50 ตร.วา", type: "บ้านเดี่ยว", tag: "โปรพิเศษ", views: 256, saves: 35, agent: "คุณนภา", agentCompany: "BanChangHub", daysAgo: 7, photos: 10 },
 ];
 
-const SERVICES = [
+// Fallback ถ้า DB ยังไม่พร้อม
+const DEFAULT_SERVICES = [
   { title: "สร้างบ้านใหม่", desc: "ออกแบบและสร้างบ้านในฝัน ควบคุมทุกขั้นตอนโดยวิศวกร", startPrice: "8,500", unit: "บาท/ตร.ม.", features: ["ออกแบบฟรี", "ควบคุมโดยวิศวกร", "รับประกัน 5 ปี"], accent: "from-teal-500 to-emerald-500" },
   { title: "รีโนเวทบ้าน", desc: "ปรับปรุงบ้านเก่าให้เป็นบ้านใหม่ งานไฟ ประปา โครงสร้าง ครบวงจร", startPrice: "3,500", unit: "บาท/ตร.ม.", features: ["ประเมินราคาฟรี", "ไม่มีค่าใช้จ่ายซ่อน", "ดูแลหลังงาน"], accent: "from-sky-500 to-blue-500" },
   { title: "ต่อเติม-ปรับปรุง", desc: "ต่อเติมห้อง ครัว หลังคา ระเบียง เพิ่มพื้นที่ใช้สอย", startPrice: "5,000", unit: "บาท/ตร.ม.", features: ["ตรวจโครงสร้างฟรี", "ใบอนุญาตถูกต้อง", "วัสดุคุณภาพ"], accent: "from-amber-500 to-orange-500" },
@@ -89,6 +90,37 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
   const [currentBanner, setCurrentBanner] = useState(0);
+  const [services, setServices] = useState(DEFAULT_SERVICES);
+
+  // Load service pricing from DB
+  useEffect(() => {
+    async function loadPricing() {
+      try {
+        const { createClient } = await import("@/lib/supabase-browser");
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("service_pricing")
+          .select("*")
+          .eq("is_active", true)
+          .order("sort_order");
+        if (data && data.length > 0) {
+          setServices(
+            data.map((s) => ({
+              title: s.title,
+              desc: s.description ?? "",
+              startPrice: Number(s.start_price).toLocaleString(),
+              unit: s.price_unit,
+              features: (s.features as string[]) ?? [],
+              accent: s.accent_color ?? "from-teal-500 to-emerald-500",
+            }))
+          );
+        }
+      } catch {
+        // DB ยังไม่พร้อม — ใช้ default
+      }
+    }
+    loadPricing();
+  }, []);
 
   const BANNERS = [
     { title: "โปรโมชั่นพิเศษ! ฟรีค่าโอน", subtitle: "ซื้อบ้านจัดสรรในโครงการที่ร่วมรายการ วันนี้ - 30 เม.ย. 2569", cta: "ดูโครงการ", bg: "from-[#1e3a5f] to-[#0d9488]" },
@@ -457,7 +489,7 @@ export default function LandingPage() {
           </div>
 
           <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-            {SERVICES.map((s) => (
+            {services.map((s) => (
               <div key={s.title} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md">
                 <div className={`h-1.5 bg-gradient-to-r ${s.accent}`} />
                 <div className="p-5">
