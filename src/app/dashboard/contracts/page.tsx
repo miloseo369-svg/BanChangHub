@@ -43,9 +43,11 @@ export default function ContractsPage() {
   const [form, setForm] = useState({
     sellerName: "",
     sellerIdCard: "",
+    sellerPhone: "",
     sellerAddress: "",
     buyerName: "",
     buyerIdCard: "",
+    buyerPhone: "",
     buyerAddress: "",
     propertyTitle: "",
     propertyAddress: "",
@@ -53,6 +55,8 @@ export default function ContractsPage() {
     deposit: "",
     transferDate: "",
     contractDate: new Date().toISOString().slice(0, 10),
+    witness1: "",
+    witness2: "",
     // Rent-specific
     rentPerMonth: "",
     rentStartDate: "",
@@ -144,7 +148,10 @@ export default function ContractsPage() {
               <h3 className="mb-3 text-sm font-bold text-teal-700">{labels.seller}</h3>
               <div className="space-y-3">
                 <div><label className={labelClass}>ชื่อ-นามสกุล</label><input value={form.sellerName} onChange={(e) => update("sellerName", e.target.value)} placeholder="นาย/นาง..." className={inputClass} /></div>
-                <div><label className={labelClass}>เลขบัตรประชาชน</label><input value={form.sellerIdCard} onChange={(e) => update("sellerIdCard", e.target.value)} placeholder="X-XXXX-XXXXX-XX-X" className={inputClass} /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><label className={labelClass}>เลขบัตรประชาชน</label><input value={form.sellerIdCard} onChange={(e) => update("sellerIdCard", e.target.value)} placeholder="X-XXXX-XXXXX-XX-X" className={inputClass} /></div>
+                  <div><label className={labelClass}>เบอร์โทรศัพท์</label><input type="tel" value={form.sellerPhone} onChange={(e) => update("sellerPhone", e.target.value)} placeholder="08X-XXX-XXXX" className={inputClass} /></div>
+                </div>
                 <div><label className={labelClass}>ที่อยู่</label><input value={form.sellerAddress} onChange={(e) => update("sellerAddress", e.target.value)} placeholder="บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด" className={inputClass} /></div>
               </div>
             </div>
@@ -154,8 +161,20 @@ export default function ContractsPage() {
               <h3 className="mb-3 text-sm font-bold text-sky-700">{labels.buyer}</h3>
               <div className="space-y-3">
                 <div><label className={labelClass}>ชื่อ-นามสกุล</label><input value={form.buyerName} onChange={(e) => update("buyerName", e.target.value)} placeholder="นาย/นาง..." className={inputClass} /></div>
-                <div><label className={labelClass}>เลขบัตรประชาชน</label><input value={form.buyerIdCard} onChange={(e) => update("buyerIdCard", e.target.value)} placeholder="X-XXXX-XXXXX-XX-X" className={inputClass} /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><label className={labelClass}>เลขบัตรประชาชน</label><input value={form.buyerIdCard} onChange={(e) => update("buyerIdCard", e.target.value)} placeholder="X-XXXX-XXXXX-XX-X" className={inputClass} /></div>
+                  <div><label className={labelClass}>เบอร์โทรศัพท์</label><input type="tel" value={form.buyerPhone} onChange={(e) => update("buyerPhone", e.target.value)} placeholder="08X-XXX-XXXX" className={inputClass} /></div>
+                </div>
                 <div><label className={labelClass}>ที่อยู่</label><input value={form.buyerAddress} onChange={(e) => update("buyerAddress", e.target.value)} placeholder="บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด" className={inputClass} /></div>
+              </div>
+            </div>
+
+            {/* Witnesses */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h3 className="mb-3 text-sm font-bold text-slate-700">พยาน (ไม่บังคับ)</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div><label className={labelClass}>พยานคนที่ 1</label><input value={form.witness1} onChange={(e) => update("witness1", e.target.value)} placeholder="ชื่อ-นามสกุล" className={inputClass} /></div>
+                <div><label className={labelClass}>พยานคนที่ 2</label><input value={form.witness2} onChange={(e) => update("witness2", e.target.value)} placeholder="ชื่อ-นามสกุล" className={inputClass} /></div>
               </div>
             </div>
 
@@ -202,11 +221,11 @@ export default function ContractsPage() {
 
             <div className="space-y-4 text-sm leading-relaxed text-slate-700">
               <p>
-                สัญญาฉบับนี้ทำขึ้นระหว่าง <strong>{form.sellerName || "_______________"}</strong> เลขบัตรประชาชน {form.sellerIdCard || "_____________"} อยู่ที่ {form.sellerAddress || "_______________"} ซึ่งต่อไปในสัญญานี้เรียกว่า <strong>&quot;{labels.seller}&quot;</strong> ฝ่ายหนึ่ง
+                สัญญาฉบับนี้ทำขึ้นระหว่าง <strong>{form.sellerName || "_______________"}</strong> เลขบัตรประชาชน {form.sellerIdCard || "_____________"}{form.sellerPhone ? ` โทร ${form.sellerPhone}` : ""} อยู่ที่ {form.sellerAddress || "_______________"} ซึ่งต่อไปในสัญญานี้เรียกว่า <strong>&quot;{labels.seller}&quot;</strong> ฝ่ายหนึ่ง
               </p>
 
               <p>
-                กับ <strong>{form.buyerName || "_______________"}</strong> เลขบัตรประชาชน {form.buyerIdCard || "_____________"} อยู่ที่ {form.buyerAddress || "_______________"} ซึ่งต่อไปในสัญญานี้เรียกว่า <strong>&quot;{labels.buyer}&quot;</strong> อีกฝ่ายหนึ่ง
+                กับ <strong>{form.buyerName || "_______________"}</strong> เลขบัตรประชาชน {form.buyerIdCard || "_____________"}{form.buyerPhone ? ` โทร ${form.buyerPhone}` : ""} อยู่ที่ {form.buyerAddress || "_______________"} ซึ่งต่อไปในสัญญานี้เรียกว่า <strong>&quot;{labels.buyer}&quot;</strong> อีกฝ่ายหนึ่ง
               </p>
 
               <p>
@@ -368,11 +387,13 @@ export default function ContractsPage() {
               <div className="mt-6 grid grid-cols-2 gap-8">
                 <div className="text-center">
                   <div className="mb-8 border-b border-dotted border-slate-300" />
-                  <p className="text-xs text-slate-500">(พยาน 1)</p>
+                  <p className="text-xs text-slate-500">({form.witness1 || "พยาน 1"})</p>
+                  <p className="text-xs font-semibold text-slate-700">พยาน</p>
                 </div>
                 <div className="text-center">
                   <div className="mb-8 border-b border-dotted border-slate-300" />
-                  <p className="text-xs text-slate-500">(พยาน 2)</p>
+                  <p className="text-xs text-slate-500">({form.witness2 || "พยาน 2"})</p>
+                  <p className="text-xs font-semibold text-slate-700">พยาน</p>
                 </div>
               </div>
             </div>
