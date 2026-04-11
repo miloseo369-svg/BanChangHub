@@ -5,11 +5,11 @@ import { createClient } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
 import { Check, X } from "lucide-react";
 
-export default function AdminPaymentActions({
-  paymentId,
+export default function AdminTopupActions({
+  topupId,
   status,
 }: {
-  paymentId: string;
+  topupId: string;
   status: string;
 }) {
   const [loading, setLoading] = useState(false);
@@ -18,35 +18,34 @@ export default function AdminPaymentActions({
 
   async function handleConfirm() {
     setLoading(true);
-    const { error } = await supabase.rpc("confirm_payment", {
-      payment_id: paymentId,
+    const { error } = await supabase.rpc("confirm_topup", {
+      p_topup_id: topupId,
     });
 
     if (error) {
       alert("ยืนยันไม่สำเร็จ: " + error.message);
     } else {
-      // confirm_payment() SQL function จะ log เองอัตโนมัติแล้ว
       router.refresh();
     }
     setLoading(false);
   }
 
   async function handleReject() {
-    if (!window.confirm("ปฏิเสธการชำระเงินนี้?")) return;
+    if (!window.confirm("ปฏิเสธการเติมเครดิตนี้?")) return;
     setLoading(true);
 
     const { error } = await supabase
-      .from("payments")
+      .from("topup_requests")
       .update({ status: "rejected" })
-      .eq("id", paymentId);
+      .eq("id", topupId);
 
     if (error) {
       alert("อัปเดตไม่สำเร็จ: " + error.message);
     } else {
       await supabase.rpc("log_activity", {
-        p_action: "payment.rejected",
-        p_entity_type: "payment",
-        p_entity_id: paymentId,
+        p_action: "topup.rejected",
+        p_entity_type: "topup_request",
+        p_entity_id: topupId,
         p_metadata: {},
       });
       router.refresh();
@@ -62,7 +61,7 @@ export default function AdminPaymentActions({
         onClick={handleConfirm}
         disabled={loading}
         className="flex h-7 w-7 items-center justify-center rounded-md bg-green-50 text-green-600 hover:bg-green-100 disabled:opacity-50"
-        title="ยืนยันชำระ"
+        title="ยืนยันเติมเครดิต"
       >
         <Check size={14} />
       </button>

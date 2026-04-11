@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/admin";
-import { Users, ShieldCheck, Search } from "lucide-react";
+import { Users, ShieldCheck, Search, Crown } from "lucide-react";
 import AdminUserActions from "./actions";
 
 export default async function AdminUsersPage({
@@ -8,7 +8,7 @@ export default async function AdminUsersPage({
   searchParams: Promise<{ q?: string; role?: string }>;
 }) {
   const params = await searchParams;
-  const { supabase } = await requireAdmin();
+  const { supabase, role: currentUserRole } = await requireAdmin();
 
   let query = supabase
     .from("profiles")
@@ -29,6 +29,7 @@ export default async function AdminUsersPage({
     agent: { text: "ตัวแทน", cls: "bg-blue-100 text-blue-600" },
     contractor: { text: "ผู้รับเหมา", cls: "bg-teal-100 text-teal-600" },
     admin: { text: "แอดมิน", cls: "bg-red-100 text-red-600" },
+    super_admin: { text: "Super Admin", cls: "bg-amber-100 text-amber-700" },
   };
 
   return (
@@ -59,6 +60,9 @@ export default async function AdminUsersPage({
           <option value="agent">ตัวแทน</option>
           <option value="contractor">ผู้รับเหมา</option>
           <option value="admin">แอดมิน</option>
+          {currentUserRole === "super_admin" && (
+            <option value="super_admin">Super Admin</option>
+          )}
         </select>
         <button type="submit" className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700">
           ค้นหา
@@ -90,7 +94,12 @@ export default async function AdminUsersPage({
                           {(u.full_name ?? "?").charAt(0)}
                         </div>
                         <div>
-                          <p className="font-medium text-slate-800">{u.full_name || "ไม่มีชื่อ"}</p>
+                          <p className="flex items-center gap-1 font-medium text-slate-800">
+                            {u.full_name || "ไม่มีชื่อ"}
+                            {u.role === "super_admin" && (
+                              <Crown size={12} className="text-amber-500" />
+                            )}
+                          </p>
                           {u.company_name && <p className="text-[11px] text-slate-400">{u.company_name}</p>}
                         </div>
                       </div>
@@ -110,7 +119,12 @@ export default async function AdminUsersPage({
                       {new Date(u.created_at).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "2-digit" })}
                     </td>
                     <td className="px-4 py-3">
-                      <AdminUserActions userId={u.id} role={u.role} isVerified={u.is_verified} />
+                      <AdminUserActions
+                        userId={u.id}
+                        role={u.role}
+                        isVerified={u.is_verified}
+                        currentUserRole={currentUserRole}
+                      />
                     </td>
                   </tr>
                 );

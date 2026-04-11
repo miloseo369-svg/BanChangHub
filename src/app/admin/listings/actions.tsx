@@ -8,9 +8,11 @@ import { Check, X, MoreVertical, Eye, Ban, RotateCcw } from "lucide-react";
 export default function AdminListingActions({
   listingId,
   status,
+  listingCode,
 }: {
   listingId: string;
   status: string;
+  listingCode?: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -32,6 +34,25 @@ export default function AdminListingActions({
       .eq("id", listingId);
 
     if (!error) {
+      // Log activity
+      const action =
+        newStatus === "active"
+          ? "listing.approved"
+          : newStatus === "rejected"
+            ? "listing.rejected"
+            : "listing.status_changed";
+
+      await supabase.rpc("log_activity", {
+        p_action: action,
+        p_entity_type: "listing",
+        p_entity_id: listingId,
+        p_metadata: {
+          listing_code: listingCode,
+          old_status: status,
+          new_status: newStatus,
+        },
+      });
+
       router.refresh();
     }
     setLoading(false);

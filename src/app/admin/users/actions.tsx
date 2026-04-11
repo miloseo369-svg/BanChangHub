@@ -9,36 +9,55 @@ export default function AdminUserActions({
   userId,
   role,
   isVerified,
+  currentUserRole,
 }: {
   userId: string;
   role: string;
   isVerified: boolean;
+  currentUserRole: "admin" | "super_admin";
 }) {
   const [showMenu, setShowMenu] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
-  async function updateProfile(updates: Record<string, unknown>) {
-    // ป้องกัน admin ลด role ตัวเอง
-    if (updates.role && updates.role !== "admin") {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.id === userId) {
-        alert("ไม่สามารถลด Role ของตัวเองได้");
-        return;
-      }
-    }
+  const isSuperAdmin = currentUserRole === "super_admin";
 
+  async function handleToggleVerify() {
     setLoading(true);
     setShowMenu(false);
 
     const { error } = await supabase
       .from("profiles")
-      .update(updates)
+      .update({ is_verified: !isVerified })
       .eq("id", userId);
 
     if (error) {
       alert("อัปเดตไม่สำเร็จ: " + error.message);
+    } else {
+      // Log activity
+      await supabase.rpc("log_activity", {
+        p_action: "user.verified",
+        p_entity_type: "profile",
+        p_entity_id: userId,
+        p_metadata: { is_verified: !isVerified },
+      });
+      router.refresh();
+    }
+    setLoading(false);
+  }
+
+  async function handleChangeRole(newRole: string) {
+    setLoading(true);
+    setShowMenu(false);
+
+    const { error } = await supabase.rpc("admin_update_role", {
+      p_user_id: userId,
+      p_new_role: newRole,
+    });
+
+    if (error) {
+      alert("เปลี่ยน Role ไม่สำเร็จ: " + error.message);
     } else {
       router.refresh();
     }
@@ -50,7 +69,17 @@ export default function AdminUserActions({
     { value: "agent", label: "ตัวแทน" },
     { value: "contractor", label: "ผู้รับเหมา" },
     { value: "admin", label: "แอดมิน" },
+    ...(isSuperAdmin
+      ? [{ value: "super_admin", label: "Super Admin" }]
+      : []),
   ];
+
+  // admin ธรรมดาไม่สามารถจัดการ super_admin ได้
+  if (role === "super_admin" && !isSuperAdmin) {
+    return (
+      <span className="text-[10px] text-amber-500">Super Admin</span>
+    );
+  }
 
   return (
     <div className="relative">
@@ -67,7 +96,7 @@ export default function AdminUserActions({
           <div className="absolute right-0 top-8 z-20 w-44 rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
             {/* Toggle verify */}
             <button
-              onClick={() => updateProfile({ is_verified: !isVerified })}
+              onClick={handleToggleVerify}
               disabled={loading}
               className="flex w-full items-center gap-2 px-3 py-2 text-xs text-slate-700 hover:bg-slate-50"
             >
@@ -83,12 +112,14 @@ export default function AdminUserActions({
               {roles.map((r) => (
                 <button
                   key={r.value}
-                  onClick={() => updateProfile({ role: r.value })}
+                  onClick={() => handleChangeRole(r.value)}
                   disabled={loading || role === r.value}
                   className={`flex w-full rounded-md px-2 py-1 text-xs ${
                     role === r.value
                       ? "font-semibold text-teal-600"
-                      : "text-slate-600 hover:bg-slate-50"
+                      : r.value === "super_admin"
+                        ? "text-amber-600 hover:bg-amber-50"
+                        : "text-slate-600 hover:bg-slate-50"
                   } disabled:opacity-50`}
                 >
                   {r.label} {role === r.value && " (ปัจจุบัน)"}

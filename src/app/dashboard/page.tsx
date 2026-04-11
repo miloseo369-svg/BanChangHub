@@ -8,7 +8,6 @@ import {
   Heart,
   MessageCircle,
   Settings,
-  LogOut,
   FileText,
   TrendingUp,
   Clock,
@@ -19,8 +18,12 @@ import {
   Calendar,
   CheckCircle2,
   AlertCircle,
+  Users,
+  Wallet,
+  Building2,
 } from "lucide-react";
 import NotificationBell from "./notifications";
+import WalletBadge from "@/components/wallet-badge";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -135,6 +138,7 @@ export default async function DashboardPage() {
           </Link>
 
           <div className="flex items-center gap-3">
+            <WalletBadge />
             <NotificationBell />
             <Link
               href="/profile"
@@ -462,9 +466,34 @@ export default async function DashboardPage() {
                     icon: BarChart3,
                   },
                   {
+                    label: "CRM",
+                    href: "/dashboard/crm",
+                    icon: Users,
+                  },
+                  {
+                    label: "Analytics",
+                    href: "/dashboard/analytics",
+                    icon: TrendingUp,
+                  },
+                  {
                     label: "แพ็กเกจ",
                     href: "/dashboard/packages",
                     icon: Package,
+                  },
+                  {
+                    label: "กระเป๋าเครดิต",
+                    href: "/dashboard/wallet",
+                    icon: Wallet,
+                  },
+                  {
+                    label: "จัดการทีม",
+                    href: "/dashboard/team",
+                    icon: Users,
+                  },
+                  {
+                    label: "องค์กร",
+                    href: "/dashboard/organization",
+                    icon: Building2,
                   },
                   {
                     label: "สร้างสัญญา",

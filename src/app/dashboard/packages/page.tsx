@@ -116,6 +116,7 @@ export default async function PackagesPage() {
             const features = pkg.features as Record<string, boolean> | null;
             const isCurrent = pkg.name === currentPackageName;
 
+            const maxCoAgents = pkg.max_co_agents ?? 0;
             const featureList = [
               {
                 text: pkg.max_listings === -1 ? "ลงประกาศไม่จำกัด" : `ลงประกาศได้ ${pkg.max_listings} รายการ`,
@@ -123,6 +124,7 @@ export default async function PackagesPage() {
               },
               { text: "เห็นข้อมูลผู้ประกาศทั้งหมด", included: pkg.price > 0 },
               { text: "บูสต์ประกาศ", included: features?.boost ?? false },
+              { text: `Co-Agent ${maxCoAgents} คน`, included: maxCoAgents > 0 },
               { text: "ป้าย Certified", included: features?.certified ?? false },
               { text: "ซัพพอร์ตด่วน", included: features?.priority_support ?? false },
               { text: `ระยะเวลา ${pkg.duration_days} วัน`, included: true },

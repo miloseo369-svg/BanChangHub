@@ -121,7 +121,7 @@ export default async function AdminListingsPage({
                         {new Date(l.created_at).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "2-digit" })}
                       </td>
                       <td className="px-4 py-3">
-                        <AdminListingActions listingId={l.id} status={l.status} />
+                        <AdminListingActions listingId={l.id} status={l.status} listingCode={l.listing_code} />
                       </td>
                     </tr>
                   );
