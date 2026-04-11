@@ -13,6 +13,7 @@ import {
   ScrollText,
   Wallet,
   UserPlus,
+  Settings,
 } from "lucide-react";
 
 const NAV = [
@@ -25,6 +26,7 @@ const NAV = [
   { label: "ราคาบริการ", href: "/admin/pricing", icon: DollarSign },
   { label: "แบนเนอร์", href: "/admin/banners", icon: Image },
   { label: "LINE Bot", href: "/admin/line", icon: MessageCircle },
+  { label: "ตั้งค่าเว็บ", href: "/admin/settings", icon: Settings },
 ];
 
 const SUPER_ADMIN_NAV = [

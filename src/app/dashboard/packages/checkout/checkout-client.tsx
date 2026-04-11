@@ -15,19 +15,18 @@ import {
   ImagePlus,
 } from "lucide-react";
 
-const PROMPTPAY_NUMBER = process.env.NEXT_PUBLIC_PROMPTPAY_ID || "";
-const IS_PROMPTPAY_SET = !!process.env.NEXT_PUBLIC_PROMPTPAY_ID;
-
 export default function CheckoutClient({
   packageId,
   packageName,
   amount,
   existingPaymentId,
+  promptpayId,
 }: {
   packageId: number;
   packageName: string;
   amount: number;
   existingPaymentId: string | null;
+  promptpayId: string;
 }) {
   const [paymentId, setPaymentId] = useState(existingPaymentId);
   const [qrDataUrl, setQrDataUrl] = useState("");
@@ -44,7 +43,7 @@ export default function CheckoutClient({
   // Generate QR on mount
   useEffect(() => {
     const payload = generatePromptPayPayload({
-      phoneOrTaxId: PROMPTPAY_NUMBER,
+      phoneOrTaxId: promptpayId,
       amount,
     });
     QRCode.toDataURL(payload, {
@@ -133,7 +132,7 @@ export default function CheckoutClient({
   }
 
   function handleCopy() {
-    navigator.clipboard.writeText(PROMPTPAY_NUMBER);
+    navigator.clipboard.writeText(promptpayId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -147,7 +146,7 @@ export default function CheckoutClient({
             สแกน QR PromptPay เพื่อชำระ
           </h2>
 
-          {!IS_PROMPTPAY_SET && (
+          {!!!promptpayId && (
             <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
               ยังไม่ได้ตั้งค่า PromptPay — กรุณาติดต่อแอดมิน
             </div>
@@ -175,7 +174,7 @@ export default function CheckoutClient({
             <div className="flex items-center justify-between">
               <span className="text-slate-500">PromptPay</span>
               <div className="flex items-center gap-2">
-                <span className="font-mono font-medium text-slate-800">{PROMPTPAY_NUMBER}</span>
+                <span className="font-mono font-medium text-slate-800">{promptpayId}</span>
                 <button onClick={handleCopy} className="text-teal-600 hover:text-teal-700" title="คัดลอก">
                   {copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}
                 </button>

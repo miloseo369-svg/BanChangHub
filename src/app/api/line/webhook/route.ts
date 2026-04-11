@@ -82,7 +82,7 @@ async function handleSearch(replyToken: string, keyword: string) {
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://banchanghub.vercel.app";
-  const messages = listings.slice(0, 3).map((l) => {
+  const messages = await Promise.all(listings.slice(0, 3).map((l) => {
     const images = (l.listing_images as { url: string; is_cover: boolean }[]) ?? [];
     const cover = images.find((i) => i.is_cover) ?? images[0];
     const prov = l.provinces as unknown as { name: string } | null;
@@ -97,7 +97,7 @@ async function handleSearch(replyToken: string, keyword: string) {
       imageUrl: cover?.url,
       url: `${appUrl}/listings/${l.slug ?? l.id}`,
     });
-  });
+  }));
 
   await lineReply(replyToken, messages);
 }
@@ -116,7 +116,7 @@ async function handleLatest(replyToken: string) {
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://banchanghub.vercel.app";
-  const messages = listings.map((l) => {
+  const messages = await Promise.all(listings.map((l) => {
     const images = (l.listing_images as { url: string; is_cover: boolean }[]) ?? [];
     const cover = images.find((i) => i.is_cover) ?? images[0];
     const prov = l.provinces as unknown as { name: string } | null;
@@ -131,7 +131,7 @@ async function handleLatest(replyToken: string) {
       imageUrl: cover?.url,
       url: `${appUrl}/listings/${l.slug ?? l.id}`,
     });
-  });
+  }));
 
   await lineReply(replyToken, messages);
 }

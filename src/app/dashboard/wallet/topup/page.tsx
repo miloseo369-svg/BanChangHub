@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Wallet } from "lucide-react";
 import TopupClient from "./topup-client";
+import { getSiteSettings } from "@/lib/settings";
 
 export default async function TopupPage() {
   const supabase = await createClient();
@@ -53,6 +54,7 @@ export default async function TopupPage() {
         <TopupClient
           existingTopupId={existingTopup?.id ?? null}
           existingAmount={existingTopup ? Number(existingTopup.amount) : null}
+          promptpayId={(await getSiteSettings()).promptpay_id}
         />
       </div>
     </div>

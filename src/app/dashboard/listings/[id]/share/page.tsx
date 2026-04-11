@@ -16,6 +16,8 @@ import {
   Globe,
 } from "lucide-react";
 
+type SiteContact = { contact_phone: string; line_id: string };
+
 type Listing = {
   id: string;
   title: string;
@@ -34,60 +36,62 @@ type Listing = {
   listing_images: { url: string; is_cover: boolean }[];
 };
 
-const TEMPLATES = [
-  {
-    id: "standard",
-    name: "มาตรฐาน",
-    generate: (l: Listing, url: string) =>
-      `🏠 ${l.listing_type === "sell" ? "ขาย" : l.listing_type === "rent" ? "ให้เช่า" : "เซ้ง"}${l.categories?.name ? ` ${l.categories.name}` : ""}\n\n` +
-      `📌 ${l.title}\n` +
-      `📍 ${[l.district, l.provinces?.name].filter(Boolean).join(", ")}\n\n` +
-      `💰 ราคา ${l.price ? `฿${Number(l.price).toLocaleString()}` : "สอบถาม"}\n\n` +
-      (l.bedrooms || l.bathrooms || l.floor_area
-        ? `🛏 ${l.bedrooms || "-"} ห้องนอน | 🚿 ${l.bathrooms || "-"} ห้องน้ำ${l.floor_area ? ` | 📐 ${l.floor_area} ตร.ม.` : ""}${l.land_area ? ` | 🏞 ${l.land_area}` : ""}\n\n`
-        : "") +
-      (l.description ? `${l.description.slice(0, 200)}${l.description.length > 200 ? "..." : ""}\n\n` : "") +
-      `🔗 ดูรายละเอียด: ${url}\n` +
-      `📞 สนใจติดต่อ: ${typeof window !== "undefined" ? process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "" : ""}\n\n` +
-      `#BanChangHub #${l.provinces?.name?.replace(/\s/g, "") ?? "อีสาน"} #${l.listing_type === "sell" ? "ขายบ้าน" : l.listing_type === "rent" ? "เช่าบ้าน" : "เซ้งกิจการ"}`,
-  },
-  {
-    id: "short",
-    name: "สั้นกระชับ",
-    generate: (l: Listing, url: string) =>
-      `${l.listing_type === "sell" ? "🔥 ขาย" : l.listing_type === "rent" ? "🏡 ให้เช่า" : "💼 เซ้ง"} ${l.title}\n` +
-      `💰 ${l.price ? `฿${Number(l.price).toLocaleString()}` : "สอบถาม"}\n` +
-      `📍 ${l.provinces?.name ?? ""}\n` +
-      `👉 ${url}`,
-  },
-  {
-    id: "detail",
-    name: "ละเอียด",
-    generate: (l: Listing, url: string) =>
-      `═══════════════════\n` +
-      `🏠 ${l.listing_type === "sell" ? "ประกาศขาย" : l.listing_type === "rent" ? "ประกาศให้เช่า" : "ประกาศเซ้ง"}\n` +
-      `═══════════════════\n\n` +
-      `📌 ${l.title}\n` +
-      `🔖 รหัสทรัพย์: ${l.listing_code ?? "-"}\n` +
-      `📍 ${[l.district, l.provinces?.name].filter(Boolean).join(", ")}\n\n` +
-      `💰 ราคา: ${l.price ? `฿${Number(l.price).toLocaleString()} บาท` : "สอบถามราคา"}\n\n` +
-      `📋 รายละเอียด:\n` +
-      (l.bedrooms ? `  🛏 ห้องนอน: ${l.bedrooms}\n` : "") +
-      (l.bathrooms ? `  🚿 ห้องน้ำ: ${l.bathrooms}\n` : "") +
-      (l.parking ? `  🚗 ที่จอดรถ: ${l.parking}\n` : "") +
-      (l.floor_area ? `  📐 พื้นที่: ${l.floor_area} ตร.ม.\n` : "") +
-      (l.land_area ? `  🏞 เนื้อที่: ${l.land_area}\n` : "") +
-      `\n` +
-      (l.description ? `📝 ${l.description.slice(0, 300)}${l.description.length > 300 ? "..." : ""}\n\n` : "") +
-      `🔗 ดูรายละเอียดเพิ่มเติม:\n${url}\n\n` +
-      `📞 ติดต่อสอบถาม:\n` +
-      `โทร: ${typeof window !== "undefined" ? process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "" : ""}\n` +
-      `LINE: ${typeof window !== "undefined" ? process.env.NEXT_PUBLIC_LINE_ID ?? "" : ""}\n\n` +
-      `═══════════════════\n` +
-      `BanChangHub - บ้านช่างฮับ\n` +
-      `#${l.categories?.name?.replace(/\s/g, "") ?? "อสังหา"} #${l.provinces?.name?.replace(/\s/g, "") ?? "อีสาน"} #BanChangHub`,
-  },
-];
+function getTemplates(contact: SiteContact) {
+  return [
+    {
+      id: "standard",
+      name: "มาตรฐาน",
+      generate: (l: Listing, url: string) =>
+        `🏠 ${l.listing_type === "sell" ? "ขาย" : l.listing_type === "rent" ? "ให้เช่า" : "เซ้ง"}${l.categories?.name ? ` ${l.categories.name}` : ""}\n\n` +
+        `📌 ${l.title}\n` +
+        `📍 ${[l.district, l.provinces?.name].filter(Boolean).join(", ")}\n\n` +
+        `💰 ราคา ${l.price ? `฿${Number(l.price).toLocaleString()}` : "สอบถาม"}\n\n` +
+        (l.bedrooms || l.bathrooms || l.floor_area
+          ? `🛏 ${l.bedrooms || "-"} ห้องนอน | 🚿 ${l.bathrooms || "-"} ห้องน้ำ${l.floor_area ? ` | 📐 ${l.floor_area} ตร.ม.` : ""}${l.land_area ? ` | 🏞 ${l.land_area}` : ""}\n\n`
+          : "") +
+        (l.description ? `${l.description.slice(0, 200)}${l.description.length > 200 ? "..." : ""}\n\n` : "") +
+        `🔗 ดูรายละเอียด: ${url}\n` +
+        (contact.contact_phone ? `📞 สนใจติดต่อ: ${contact.contact_phone}\n` : "") +
+        `\n#BanChangHub #${l.provinces?.name?.replace(/\s/g, "") ?? "อีสาน"} #${l.listing_type === "sell" ? "ขายบ้าน" : l.listing_type === "rent" ? "เช่าบ้าน" : "เซ้งกิจการ"}`,
+    },
+    {
+      id: "short",
+      name: "สั้นกระชับ",
+      generate: (l: Listing, url: string) =>
+        `${l.listing_type === "sell" ? "🔥 ขาย" : l.listing_type === "rent" ? "🏡 ให้เช่า" : "💼 เซ้ง"} ${l.title}\n` +
+        `💰 ${l.price ? `฿${Number(l.price).toLocaleString()}` : "สอบถาม"}\n` +
+        `📍 ${l.provinces?.name ?? ""}\n` +
+        `👉 ${url}`,
+    },
+    {
+      id: "detail",
+      name: "ละเอียด",
+      generate: (l: Listing, url: string) =>
+        `═══════════════════\n` +
+        `🏠 ${l.listing_type === "sell" ? "ประกาศขาย" : l.listing_type === "rent" ? "ประกาศให้เช่า" : "ประกาศเซ้ง"}\n` +
+        `═══════════════════\n\n` +
+        `📌 ${l.title}\n` +
+        `🔖 รหัสทรัพย์: ${l.listing_code ?? "-"}\n` +
+        `📍 ${[l.district, l.provinces?.name].filter(Boolean).join(", ")}\n\n` +
+        `💰 ราคา: ${l.price ? `฿${Number(l.price).toLocaleString()} บาท` : "สอบถามราคา"}\n\n` +
+        `📋 รายละเอียด:\n` +
+        (l.bedrooms ? `  🛏 ห้องนอน: ${l.bedrooms}\n` : "") +
+        (l.bathrooms ? `  🚿 ห้องน้ำ: ${l.bathrooms}\n` : "") +
+        (l.parking ? `  🚗 ที่จอดรถ: ${l.parking}\n` : "") +
+        (l.floor_area ? `  📐 พื้นที่: ${l.floor_area} ตร.ม.\n` : "") +
+        (l.land_area ? `  🏞 เนื้อที่: ${l.land_area}\n` : "") +
+        `\n` +
+        (l.description ? `📝 ${l.description.slice(0, 300)}${l.description.length > 300 ? "..." : ""}\n\n` : "") +
+        `🔗 ดูรายละเอียดเพิ่มเติม:\n${url}\n\n` +
+        `📞 ติดต่อสอบถาม:\n` +
+        (contact.contact_phone ? `โทร: ${contact.contact_phone}\n` : "") +
+        (contact.line_id ? `LINE: ${contact.line_id}\n` : "") +
+        `\n═══════════════════\n` +
+        `BanChangHub - บ้านช่างฮับ\n` +
+        `#${l.categories?.name?.replace(/\s/g, "") ?? "อสังหา"} #${l.provinces?.name?.replace(/\s/g, "") ?? "อีสาน"} #BanChangHub`,
+    },
+  ];
+}
 
 export default function ShareTemplatePage({
   params: paramsPromise,
@@ -97,6 +101,7 @@ export default function ShareTemplatePage({
   const params = use(paramsPromise);
   const supabase = createClient();
   const [listing, setListing] = useState<Listing | null>(null);
+  const [contact, setContact] = useState<SiteContact>({ contact_phone: "", line_id: "" });
   const [selectedTemplate, setSelectedTemplate] = useState("standard");
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -104,12 +109,26 @@ export default function ShareTemplatePage({
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
-        .from("listings")
-        .select("*, categories:category_id(name), provinces:province_id(name), listing_images(url, is_cover)")
-        .eq("id", params.id)
-        .single();
-      if (data) setListing(data as unknown as Listing);
+      const [listingRes, settingsRes] = await Promise.all([
+        supabase
+          .from("listings")
+          .select("*, categories:category_id(name), provinces:province_id(name), listing_images(url, is_cover)")
+          .eq("id", params.id)
+          .single(),
+        supabase
+          .from("site_settings")
+          .select("key, value")
+          .in("key", ["contact_phone", "line_id"]),
+      ]);
+      if (listingRes.data) setListing(listingRes.data as unknown as Listing);
+      if (settingsRes.data) {
+        const c: SiteContact = { contact_phone: "", line_id: "" };
+        for (const row of settingsRes.data) {
+          if (row.key === "contact_phone") c.contact_phone = row.value;
+          if (row.key === "line_id") c.line_id = row.value;
+        }
+        setContact(c);
+      }
       setLoading(false);
     }
     load();
@@ -121,7 +140,8 @@ export default function ShareTemplatePage({
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://banchanghub.vercel.app";
   const listingUrl = `${appUrl}/listings/${listing.id}`;
-  const template = TEMPLATES.find((t) => t.id === selectedTemplate) ?? TEMPLATES[0];
+  const templates = getTemplates(contact);
+  const template = templates.find((t) => t.id === selectedTemplate) ?? templates[0];
   const generatedText = template.generate(listing, listingUrl);
 
   function handleCopy() {
@@ -164,7 +184,7 @@ export default function ShareTemplatePage({
         <div className="mb-4">
           <label className="mb-2 block text-sm font-bold text-slate-800">เลือก Template</label>
           <div className="flex gap-2">
-            {TEMPLATES.map((t) => (
+            {templates.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setSelectedTemplate(t.id)}
@@ -226,7 +246,7 @@ export default function ShareTemplatePage({
           </a>
 
           <a
-            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(TEMPLATES[1].generate(listing, listingUrl))}`}
+            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(templates[1].generate(listing, listingUrl))}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-800 py-3 text-xs font-semibold text-white shadow-md hover:shadow-lg"

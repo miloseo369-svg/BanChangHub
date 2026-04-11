@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/jsonld";
+import { getSetting } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: {
@@ -26,11 +27,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const contactPhone = await getSetting("contact_phone");
+
   return (
     <html lang="th" className="h-full antialiased">
       <head>
@@ -65,11 +68,12 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="BanChangHub" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
         {/* Structured Data */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd(contactPhone)) }}
         />
         <script
           type="application/ld+json"

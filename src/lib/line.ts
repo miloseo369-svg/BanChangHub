@@ -1,4 +1,5 @@
 // LINE Messaging API utilities
+import { getSetting } from "@/lib/settings";
 
 const LINE_API = "https://api.line.me/v2/bot";
 
@@ -36,7 +37,7 @@ export async function linePush(to: string, messages: LineMessage[]) {
 
 // ─── Flex Messages ───
 
-export function listingFlexMessage(listing: {
+export async function listingFlexMessage(listing: {
   title: string;
   price: string;
   location: string;
@@ -45,7 +46,8 @@ export function listingFlexMessage(listing: {
   floor_area?: number;
   imageUrl?: string;
   url: string;
-}): LineMessage {
+}): Promise<LineMessage> {
+  const contactPhone = await getSetting("contact_phone") || "0812345678";
   return {
     type: "flex",
     altText: `${listing.title} - ${listing.price}`,
@@ -131,7 +133,7 @@ export function listingFlexMessage(listing: {
             action: {
               type: "uri",
               label: "โทรสอบถาม",
-              uri: `tel:${process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "0812345678"}`,
+              uri: `tel:${contactPhone}`,
             },
             style: "secondary",
           },

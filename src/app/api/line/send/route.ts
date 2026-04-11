@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
   const prov = listing.provinces as unknown as { name: string } | null;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://banchanghub.vercel.app";
 
-  const message = listingFlexMessage({
+  const message = await listingFlexMessage({
     title: listing.title,
     price: listing.price ? `฿${Number(listing.price).toLocaleString()}` : "สอบถามราคา",
     location: [listing.district, prov?.name].filter(Boolean).join(", ") || "ไม่ระบุ",

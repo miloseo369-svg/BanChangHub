@@ -3,7 +3,7 @@
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://banchanghub.com";
 const SITE_NAME = "BanChangHub";
 
-export function organizationJsonLd() {
+export function organizationJsonLd(contactPhone?: string) {
   return {
     "@context": "https://schema.org",
     "@type": "RealEstateAgent",
@@ -25,7 +25,7 @@ export function organizationJsonLd() {
     },
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "",
+      telephone: contactPhone ?? process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "",
       contactType: "customer service",
       availableLanguage: "Thai",
     },

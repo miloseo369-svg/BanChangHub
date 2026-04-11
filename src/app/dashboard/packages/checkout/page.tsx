@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Home, ArrowLeft, Package, Clock, ShieldCheck } from "lucide-react";
 import CheckoutClient from "./checkout-client";
+import { getSiteSettings } from "@/lib/settings";
 
 export default async function CheckoutPage({
   searchParams,
@@ -110,6 +111,7 @@ export default async function CheckoutPage({
               packageName={pkg.name}
               amount={Number(pkg.price)}
               existingPaymentId={existingPayment?.id ?? null}
+              promptpayId={(await getSiteSettings()).promptpay_id}
             />
           </div>
         </div>
