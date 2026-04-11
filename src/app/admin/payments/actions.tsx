@@ -18,6 +18,14 @@ export default function AdminPaymentActions({
 
   async function handleConfirm() {
     setLoading(true);
+
+    // ดึงข้อมูล payment ก่อน
+    const { data: payment } = await supabase
+      .from("payments")
+      .select("user_id, amount, packages:package_id(name)")
+      .eq("id", paymentId)
+      .single();
+
     const { error } = await supabase.rpc("confirm_payment", {
       payment_id: paymentId,
     });
@@ -25,7 +33,17 @@ export default function AdminPaymentActions({
     if (error) {
       alert("ยืนยันไม่สำเร็จ: " + error.message);
     } else {
-      // confirm_payment() SQL function จะ log เองอัตโนมัติแล้ว
+      // แจ้งเตือน user
+      if (payment) {
+        const pkg = payment.packages as unknown as { name: string } | null;
+        await supabase.from("notifications").insert({
+          user_id: payment.user_id,
+          type: "payment_confirmed",
+          title: "ชำระเงินสำเร็จ",
+          message: `แพ็กเกจ ${pkg?.name ?? ""} เปิดใช้งานแล้ว`,
+          link: "/dashboard/packages",
+        });
+      }
       router.refresh();
     }
     setLoading(false);
@@ -34,6 +52,13 @@ export default function AdminPaymentActions({
   async function handleReject() {
     if (!window.confirm("ปฏิเสธการชำระเงินนี้?")) return;
     setLoading(true);
+
+    // ดึงข้อมูล payment ก่อน
+    const { data: payment } = await supabase
+      .from("payments")
+      .select("user_id, amount")
+      .eq("id", paymentId)
+      .single();
 
     const { error } = await supabase
       .from("payments")
@@ -47,8 +72,19 @@ export default function AdminPaymentActions({
         p_action: "payment.rejected",
         p_entity_type: "payment",
         p_entity_id: paymentId,
-        p_metadata: {},
+        p_metadata: { amount: payment?.amount },
       });
+
+      // แจ้งเตือน user
+      if (payment) {
+        await supabase.from("notifications").insert({
+          user_id: payment.user_id,
+          type: "system",
+          title: "การชำระเงินถูกปฏิเสธ",
+          message: `การชำระเงิน ฿${Number(payment.amount).toLocaleString()} ถูกปฏิเสธ กรุณาตรวจสอบ`,
+          link: "/dashboard/packages",
+        });
+      }
       router.refresh();
     }
     setLoading(false);

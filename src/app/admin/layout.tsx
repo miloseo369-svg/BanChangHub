@@ -100,12 +100,12 @@ export default async function AdminLayout({
       </aside>
 
       {/* Mobile nav */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 flex border-t border-slate-200 bg-white lg:hidden">
-        {NAV.slice(0, 5).map((item) => (
+      <div className="fixed bottom-0 left-0 right-0 z-40 flex overflow-x-auto border-t border-slate-200 bg-white lg:hidden">
+        {NAV.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] text-slate-500 hover:text-teal-600"
+            className="flex min-w-[64px] flex-1 flex-col items-center gap-0.5 py-2 text-[10px] text-slate-500 hover:text-teal-600"
           >
             <item.icon size={18} />
             {item.label}
@@ -114,7 +114,7 @@ export default async function AdminLayout({
         {isSuperAdmin && (
           <Link
             href="/admin/activity-logs"
-            className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] text-amber-600 hover:text-amber-700"
+            className="flex min-w-[64px] flex-1 flex-col items-center gap-0.5 py-2 text-[10px] text-amber-600 hover:text-amber-700"
           >
             <ScrollText size={18} />
             Logs

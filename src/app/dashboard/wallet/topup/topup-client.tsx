@@ -120,6 +120,11 @@ export default function TopupClient({
       return;
     }
 
+    if (file.size > 5 * 1024 * 1024) {
+      setError("ไฟล์ใหญ่เกิน 5MB กรุณาเลือกรูปใหม่");
+      return;
+    }
+
     setUploading(true);
     setError("");
 
@@ -203,7 +208,8 @@ export default function TopupClient({
               />
               <button
                 onClick={handleCustomSubmit}
-                className="shrink-0 rounded-lg bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-700"
+                disabled={creating}
+                className="shrink-0 rounded-lg bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50"
               >
                 เติมเงิน
               </button>

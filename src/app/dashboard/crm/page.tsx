@@ -34,10 +34,19 @@ export default async function CrmPage({
 
   if (!user) redirect("/login");
 
+  // หา primary agents ที่ฉันเป็น co-agent ให้
+  const { data: myTeams } = await supabase
+    .from("co_agents")
+    .select("primary_agent_id")
+    .eq("co_agent_id", user.id)
+    .eq("status", "active");
+
+  const agentIds = [user.id, ...(myTeams ?? []).map((t) => t.primary_agent_id)];
+
   let query = supabase
     .from("clients")
     .select("*", { count: "exact" })
-    .eq("agent_id", user.id)
+    .in("agent_id", agentIds)
     .order("updated_at", { ascending: false });
 
   if (params.status) {
@@ -46,11 +55,11 @@ export default async function CrmPage({
 
   const { data: clients, count } = await query.limit(50);
 
-  // Count by status
+  // Count by status (รวม co-agent's clients)
   const { data: statusCounts } = await supabase
     .from("clients")
     .select("status")
-    .eq("agent_id", user.id);
+    .in("agent_id", agentIds);
 
   const counts: Record<string, number> = {};
   (statusCounts ?? []).forEach((c) => {

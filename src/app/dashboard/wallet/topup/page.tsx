@@ -21,14 +21,14 @@ export default async function TopupPage() {
     .gt("expires_at", new Date().toISOString())
     .order("created_at", { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   // Fetch current balance
   const { data: wallet } = await supabase
     .from("wallets")
     .select("balance")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   return (
     <div className="px-4 py-6 lg:px-8">

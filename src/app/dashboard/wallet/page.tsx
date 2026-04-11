@@ -24,7 +24,7 @@ export default async function WalletPage() {
     .from("wallets")
     .select("*")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   // Fetch recent transactions
   const { data: transactions } = await supabase
@@ -78,11 +78,11 @@ export default async function WalletPage() {
         <div className="flex gap-6 text-sm">
           <div>
             <p className="text-white/60">เติมทั้งหมด</p>
-            <p className="font-semibold">฿{lifetimeTopup.toLocaleString()}</p>
+            <p className="font-semibold">฿{lifetimeTopup.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</p>
           </div>
           <div>
             <p className="text-white/60">ใช้ทั้งหมด</p>
-            <p className="font-semibold">฿{lifetimeSpent.toLocaleString()}</p>
+            <p className="font-semibold">฿{lifetimeSpent.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</p>
           </div>
         </div>
       </div>
@@ -100,7 +100,7 @@ export default async function WalletPage() {
                 เติม ฿{Number(t.amount).toLocaleString()}
               </span>
               <span className="text-xs text-amber-500">
-                {new Date(t.created_at).toLocaleDateString("th-TH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                {new Date(t.created_at).toLocaleString("th-TH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
               </span>
             </div>
           ))}
@@ -141,7 +141,7 @@ export default async function WalletPage() {
                       {tx.description || info.label}
                     </p>
                     <p className="text-[11px] text-slate-400">
-                      {new Date(tx.created_at).toLocaleDateString("th-TH", {
+                      {new Date(tx.created_at).toLocaleString("th-TH", {
                         day: "numeric",
                         month: "short",
                         hour: "2-digit",
@@ -151,10 +151,10 @@ export default async function WalletPage() {
                   </div>
                   <div className="text-right">
                     <p className={`text-sm font-bold ${isPositive ? "text-green-600" : "text-red-600"}`}>
-                      {isPositive ? "+" : ""}฿{Math.abs(Number(tx.amount)).toLocaleString()}
+                      {isPositive ? "+" : ""}฿{Math.abs(Number(tx.amount)).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
                     </p>
                     <p className="text-[10px] text-slate-400">
-                      คงเหลือ ฿{Number(tx.balance_after).toLocaleString()}
+                      คงเหลือ ฿{Number(tx.balance_after).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
                     </p>
                   </div>
                 </div>

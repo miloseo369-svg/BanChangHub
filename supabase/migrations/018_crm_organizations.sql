@@ -2,7 +2,9 @@
 -- 018: CRM (Client Management) + Organizations
 -- =============================================
 
+-- ==========================================
 -- 1. Clients table (CRM contacts for agents)
+-- ==========================================
 CREATE TABLE public.clients (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   agent_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -47,7 +49,9 @@ CREATE TRIGGER update_clients_updated_at
   BEFORE UPDATE ON public.clients
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
+-- ==========================================
 -- 2. Client interactions log
+-- ==========================================
 CREATE TABLE public.client_interactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id UUID NOT NULL REFERENCES public.clients(id) ON DELETE CASCADE,
@@ -78,7 +82,13 @@ CREATE POLICY "Client interactions: deletable by agent"
   ON public.client_interactions FOR DELETE
   USING (auth.uid() = agent_id);
 
--- 3. Organizations (team management)
+-- ==========================================
+-- 3. Organizations + Members
+--    สร้าง tables ทั้ง 2 ก่อน แล้วค่อยสร้าง policies
+--    เพื่อหลีกเลี่ยง circular reference error
+-- ==========================================
+
+-- สร้าง organizations table (ยังไม่สร้าง policy)
 CREATE TABLE public.organizations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
@@ -91,6 +101,24 @@ CREATE TABLE public.organizations (
 
 ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
 
+-- สร้าง organization_members table (ยังไม่สร้าง policy)
+CREATE TABLE public.organization_members (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('owner', 'manager', 'member')),
+  joined_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(org_id, user_id)
+);
+
+CREATE INDEX idx_org_members_org ON public.organization_members(org_id);
+CREATE INDEX idx_org_members_user ON public.organization_members(user_id);
+
+ALTER TABLE public.organization_members ENABLE ROW LEVEL SECURITY;
+
+-- ==========================================
+-- 4. Policies สำหรับ organizations (ตอนนี้ organization_members มีแล้ว)
+-- ==========================================
 CREATE POLICY "Orgs: viewable by members"
   ON public.organizations FOR SELECT
   USING (
@@ -110,21 +138,9 @@ CREATE POLICY "Orgs: deletable by owner"
   ON public.organizations FOR DELETE
   USING (auth.uid() = owner_id);
 
-CREATE TABLE public.organization_members (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  org_id UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('owner', 'manager', 'member')),
-  joined_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(org_id, user_id)
-);
-
-CREATE INDEX idx_org_members_org ON public.organization_members(org_id);
-CREATE INDEX idx_org_members_user ON public.organization_members(user_id);
-
-ALTER TABLE public.organization_members ENABLE ROW LEVEL SECURITY;
-
--- ให้ org owner ดูได้เสมอ (แก้ circular dependency) + สมาชิกเดิมดูได้
+-- ==========================================
+-- 5. Policies สำหรับ organization_members
+-- ==========================================
 CREATE POLICY "Org members: viewable by org owner or members"
   ON public.organization_members FOR SELECT
   USING (
@@ -133,7 +149,6 @@ CREATE POLICY "Org members: viewable by org owner or members"
     OR public.is_admin()
   );
 
--- อนุญาตให้ owner ของ org insert สมาชิก (รวมตัวเอง), หรือ manager ที่มีอยู่แล้ว
 CREATE POLICY "Org members: insertable by org owner/manager"
   ON public.organization_members FOR INSERT
   WITH CHECK (
@@ -156,6 +171,9 @@ CREATE POLICY "Org members: deletable by org owner"
     )
   );
 
+-- ==========================================
+-- 6. Triggers
+-- ==========================================
 CREATE TRIGGER update_organizations_updated_at
   BEFORE UPDATE ON public.organizations
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();

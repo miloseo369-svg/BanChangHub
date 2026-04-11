@@ -53,6 +53,33 @@ export default function AdminListingActions({
         },
       });
 
+      // แจ้งเตือนเจ้าของประกาศ
+      const { data: listing } = await supabase
+        .from("listings")
+        .select("user_id, title")
+        .eq("id", listingId)
+        .single();
+
+      if (listing) {
+        if (newStatus === "active" && status === "pending") {
+          await supabase.from("notifications").insert({
+            user_id: listing.user_id,
+            type: "listing_approved",
+            title: "ประกาศได้รับการอนุมัติ",
+            message: `"${listing.title}" เผยแพร่บนเว็บไซต์แล้ว`,
+            link: `/listings/${listingId}`,
+          });
+        } else if (newStatus === "rejected") {
+          await supabase.from("notifications").insert({
+            user_id: listing.user_id,
+            type: "listing_rejected",
+            title: "ประกาศถูกปฏิเสธ",
+            message: `"${listing.title}" ถูกปฏิเสธ กรุณาตรวจสอบและแก้ไข`,
+            link: "/dashboard/listings",
+          });
+        }
+      }
+
       router.refresh();
     }
     setLoading(false);

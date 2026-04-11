@@ -25,10 +25,11 @@ export default function InviteForm({ canInvite }: { canInvite: boolean }) {
     setError("");
     setFoundUser(null);
 
+    const term = search.trim().replace(/[,%()]/g, "");
     const { data: users } = await supabase
       .from("profiles")
       .select("id, full_name, phone, role")
-      .or(`phone.eq.${search.trim()},full_name.ilike.%${search.trim()}%`)
+      .or(`phone.eq.${term},full_name.ilike.%${term}%`)
       .limit(1);
 
     if (!users || users.length === 0) {
@@ -68,6 +69,7 @@ export default function InviteForm({ canInvite }: { canInvite: boolean }) {
 
     if (existing && existing.length > 0) {
       setError("ผู้ใช้นี้ได้รับเชิญแล้ว");
+      setFoundUser(null);
       setLoading(false);
       return;
     }

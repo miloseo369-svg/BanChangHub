@@ -28,7 +28,7 @@ export default async function TeamPage() {
     .gt("expires_at", new Date().toISOString())
     .order("created_at", { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   const pkg = subscription?.packages as { name: string; max_co_agents: number } | null;
   const maxCoAgents = pkg?.max_co_agents ?? 0;

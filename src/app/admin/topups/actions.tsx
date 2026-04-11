@@ -18,6 +18,14 @@ export default function AdminTopupActions({
 
   async function handleConfirm() {
     setLoading(true);
+
+    // ดึงข้อมูล topup ก่อนเพื่อหา user_id และ amount
+    const { data: topup } = await supabase
+      .from("topup_requests")
+      .select("user_id, amount")
+      .eq("id", topupId)
+      .single();
+
     const { error } = await supabase.rpc("confirm_topup", {
       p_topup_id: topupId,
     });
@@ -25,6 +33,16 @@ export default function AdminTopupActions({
     if (error) {
       alert("ยืนยันไม่สำเร็จ: " + error.message);
     } else {
+      // แจ้งเตือน user ที่เติมเครดิต
+      if (topup) {
+        await supabase.from("notifications").insert({
+          user_id: topup.user_id,
+          type: "payment_confirmed",
+          title: "เติมเครดิตสำเร็จ",
+          message: `เครดิต ฿${Number(topup.amount).toLocaleString()} เข้ากระเป๋าแล้ว`,
+          link: "/dashboard/wallet",
+        });
+      }
       router.refresh();
     }
     setLoading(false);
@@ -33,6 +51,13 @@ export default function AdminTopupActions({
   async function handleReject() {
     if (!window.confirm("ปฏิเสธการเติมเครดิตนี้?")) return;
     setLoading(true);
+
+    // ดึงข้อมูล topup ก่อนเพื่อหา user_id
+    const { data: topup } = await supabase
+      .from("topup_requests")
+      .select("user_id, amount")
+      .eq("id", topupId)
+      .single();
 
     const { error } = await supabase
       .from("topup_requests")
@@ -46,8 +71,19 @@ export default function AdminTopupActions({
         p_action: "topup.rejected",
         p_entity_type: "topup_request",
         p_entity_id: topupId,
-        p_metadata: {},
+        p_metadata: { amount: topup?.amount },
       });
+
+      // แจ้งเตือน user
+      if (topup) {
+        await supabase.from("notifications").insert({
+          user_id: topup.user_id,
+          type: "system",
+          title: "เติมเครดิตถูกปฏิเสธ",
+          message: `รายการเติมเครดิต ฿${Number(topup.amount).toLocaleString()} ถูกปฏิเสธ กรุณาตรวจสอบสลิป`,
+          link: "/dashboard/wallet/topup",
+        });
+      }
       router.refresh();
     }
     setLoading(false);

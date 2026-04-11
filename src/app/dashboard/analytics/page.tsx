@@ -53,7 +53,7 @@ export default async function AnalyticsPage() {
     .from("wallets")
     .select("balance, lifetime_topup, lifetime_spent")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   // CRM Clients
   const { data: clients } = await supabase

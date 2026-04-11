@@ -7,6 +7,7 @@ const ACTION_OPTIONS = [
   { value: "", label: "ทั้งหมด" },
   { value: "user.role_changed", label: "เปลี่ยน Role" },
   { value: "user.verified", label: "ยืนยันตัวตน" },
+  { value: "user.promoted_super_admin", label: "Promote Super Admin" },
   { value: "listing.approved", label: "อนุมัติประกาศ" },
   { value: "listing.rejected", label: "ปฏิเสธประกาศ" },
   { value: "listing.status_changed", label: "เปลี่ยนสถานะประกาศ" },
@@ -14,6 +15,11 @@ const ACTION_OPTIONS = [
   { value: "payment.rejected", label: "ปฏิเสธชำระเงิน" },
   { value: "topup.confirmed", label: "ยืนยันเติมเครดิต" },
   { value: "topup.rejected", label: "ปฏิเสธเติมเครดิต" },
+  { value: "co_agent.invited", label: "เชิญ Co-Agent" },
+  { value: "co_agent.accepted", label: "ตอบรับ Co-Agent" },
+  { value: "co_agent.declined", label: "ปฏิเสธ Co-Agent" },
+  { value: "co_agent.revoked", label: "ยกเลิก Co-Agent" },
+  { value: "credit.admin_adjusted", label: "ปรับเครดิต" },
 ];
 
 export default function LogFilters({

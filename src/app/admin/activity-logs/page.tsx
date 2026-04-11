@@ -15,18 +15,26 @@ const ACTION_LABELS: Record<string, { text: string; cls: string }> = {
   "topup.confirmed": { text: "ยืนยันเติมเครดิต", cls: "bg-emerald-100 text-emerald-700" },
   "topup.rejected": { text: "ปฏิเสธเติมเครดิต", cls: "bg-red-100 text-red-600" },
   "co_agent.invited": { text: "เชิญ Co-Agent", cls: "bg-purple-100 text-purple-700" },
-  "co_agent.revoked": { text: "ยกเลิก Co-Agent", cls: "bg-orange-100 text-orange-700" },
+  "co_agent.accepted": { text: "ตอบรับ Co-Agent", cls: "bg-green-100 text-green-700" },
+  "co_agent.declined": { text: "ปฏิเสธ Co-Agent", cls: "bg-orange-100 text-orange-700" },
+  "co_agent.revoked": { text: "ยกเลิก Co-Agent", cls: "bg-red-100 text-red-600" },
+  "credit.admin_adjusted": { text: "ปรับเครดิต", cls: "bg-indigo-100 text-indigo-700" },
 };
 
 function formatMetadata(action: string, metadata: Record<string, unknown>): string {
   switch (action) {
     case "user.role_changed":
-      return `${metadata.old_role} → ${metadata.new_role}`;
+      return `${metadata.old_role ?? "?"} → ${metadata.new_role ?? "?"}`;
     case "user.verified":
       return metadata.is_verified ? "ยืนยันแล้ว" : "ยกเลิกยืนยัน";
+    case "user.promoted_super_admin":
+      return metadata.email ? String(metadata.email) : "";
     case "payment.confirmed":
     case "topup.confirmed":
-      return `฿${Number(metadata.amount).toLocaleString()} ${metadata.package ? `(${metadata.package})` : ""}`;
+      return `฿${Number(metadata.amount ?? 0).toLocaleString()} ${metadata.package ? `(${metadata.package})` : ""}`.trim();
+    case "payment.rejected":
+    case "topup.rejected":
+      return metadata.amount ? `฿${Number(metadata.amount).toLocaleString()}` : "";
     case "listing.approved":
     case "listing.rejected":
     case "listing.status_changed":
@@ -35,6 +43,14 @@ function formatMetadata(action: string, metadata: Record<string, unknown>): stri
         : metadata.new_status
           ? `→ ${metadata.new_status}`
           : "";
+    case "co_agent.invited":
+    case "co_agent.revoked":
+      return metadata.co_agent_name ? String(metadata.co_agent_name) : "";
+    case "co_agent.accepted":
+    case "co_agent.declined":
+      return metadata.primary_agent_name ? String(metadata.primary_agent_name) : "";
+    case "credit.admin_adjusted":
+      return metadata.amount ? `฿${Number(metadata.amount).toLocaleString()} — ${metadata.reason ?? ""}` : "";
     default:
       return Object.keys(metadata).length > 0 ? JSON.stringify(metadata) : "";
   }

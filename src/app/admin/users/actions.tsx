@@ -42,6 +42,18 @@ export default function AdminUserActions({
         p_entity_id: userId,
         p_metadata: { is_verified: !isVerified },
       });
+
+      // แจ้งเตือน user
+      await supabase.from("notifications").insert({
+        user_id: userId,
+        type: "system",
+        title: !isVerified ? "ยืนยันตัวตนสำเร็จ" : "สถานะยืนยันถูกยกเลิก",
+        message: !isVerified
+          ? "บัญชีของคุณได้รับการยืนยันตัวตนแล้ว"
+          : "สถานะยืนยันตัวตนของคุณถูกยกเลิก",
+        link: "/profile",
+      });
+
       router.refresh();
     }
     setLoading(false);
@@ -59,6 +71,19 @@ export default function AdminUserActions({
     if (error) {
       alert("เปลี่ยน Role ไม่สำเร็จ: " + error.message);
     } else {
+      const roleLabels: Record<string, string> = {
+        user: "ผู้ใช้", agent: "ตัวแทน", contractor: "ผู้รับเหมา",
+        admin: "แอดมิน", super_admin: "Super Admin",
+      };
+
+      await supabase.from("notifications").insert({
+        user_id: userId,
+        type: "system",
+        title: "Role ของคุณเปลี่ยนแล้ว",
+        message: `Role ของคุณถูกเปลี่ยนเป็น "${roleLabels[newRole] ?? newRole}"`,
+        link: "/dashboard",
+      });
+
       router.refresh();
     }
     setLoading(false);

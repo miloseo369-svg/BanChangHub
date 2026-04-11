@@ -91,11 +91,13 @@ export default function AgentCard({
 
       // แจ้งเตือน primary agent ว่า co-agent ตอบรับแล้ว
       if (targetUserId) {
+        const { data: { user: me } } = await supabase.auth.getUser();
+        const { data: myProfile } = await supabase.from("profiles").select("full_name").eq("id", me?.id ?? "").single();
         await supabase.from("notifications").insert({
           user_id: targetUserId,
           type: "system",
           title: "Co-Agent ตอบรับแล้ว",
-          message: `Co-Agent ตอบรับคำเชิญเข้าทีมแล้ว`,
+          message: `${myProfile?.full_name ?? "Co-Agent"} ตอบรับคำเชิญเข้าทีมแล้ว`,
           link: "/dashboard/team",
         });
       }
@@ -123,11 +125,13 @@ export default function AgentCard({
 
       // แจ้ง primary agent
       if (targetUserId) {
+        const { data: { user: me } } = await supabase.auth.getUser();
+        const { data: myProfile } = await supabase.from("profiles").select("full_name").eq("id", me?.id ?? "").single();
         await supabase.from("notifications").insert({
           user_id: targetUserId,
           type: "system",
           title: "Co-Agent ปฏิเสธคำเชิญ",
-          message: `Co-Agent ปฏิเสธคำเชิญเข้าทีม`,
+          message: `${myProfile?.full_name ?? "Co-Agent"} ปฏิเสธคำเชิญเข้าทีม`,
           link: "/dashboard/team",
         });
       }
